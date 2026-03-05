@@ -24,7 +24,7 @@
 //       <div className="flex items-center gap-1 p-2 rounded-md mb-8 ">
 //         <img
 //           src="https://aia.in.net/crm/public/assets/images/logo/new_retina_logos.webp"
-//           alt="AIA Logo"
+//           alt="Mac Logo"
 //         />
 //       </div>
 
@@ -146,7 +146,6 @@ export default function LoginForm({
         >
           Welcome back
         </h1>
-
       </motion.div>
 
       <form onSubmit={handleSubmit}>
@@ -294,10 +293,6 @@ export default function LoginForm({
           </motion.div>
         </div>
       </form>
-
-
-
-      
     </div>
   );
 }

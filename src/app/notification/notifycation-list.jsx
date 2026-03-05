@@ -2,37 +2,42 @@ import ApiErrorPage from "@/components/api-error/api-error";
 import DataTable from "@/components/common/data-table";
 import ImageCell from "@/components/common/ImageCell";
 import LoadingBar from "@/components/loader/loading-bar";
-import { COMPANY_API } from "@/constants/apiConstants";
+import { NOTIFICATION_API } from "@/constants/apiConstants";
 import { useGetApiMutation } from "@/hooks/useGetApiMutation";
 import { getImageBaseUrl, getNoImageUrl } from "@/utils/imageUtils";
 import { Edit } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import CompanyDialog from "./create-company";
+import NotificationDialog from "./create-notification";
 
-const CompanyList = () => {
+const NotificationList = () => {
   const {
     data: data,
     isLoading,
     isError,
     refetch,
   } = useGetApiMutation({
-    url: COMPANY_API.list,
-    queryKey: ["company-list"],
+    url: NOTIFICATION_API.list,
+    queryKey: ["notification-list"],
   });
+  console.log(data);
+
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState(null);
-  const IMAGE_FOR = "Student Company";
+  const IMAGE_FOR = "Notification";
   const companyBaseUrl = getImageBaseUrl(data?.image_url, IMAGE_FOR);
+  console.log(companyBaseUrl, "companyBaseUrl");
   const noImageUrl = getNoImageUrl(data?.image_url);
+
+  // console.log(columns);
 
   const columns = [
     {
       header: "Image",
-      accessorKey: "student_company_image",
+      accessorKey: "notification_image",
       cell: ({ row }) => {
-        const fileName = row.original.student_company_image;
+        const fileName = row.original.notification_image;
         const src = fileName ? `${companyBaseUrl}${fileName}` : noImageUrl;
 
         return (
@@ -46,26 +51,26 @@ const CompanyList = () => {
       enableSorting: false,
     },
     {
-      header: "Company Name",
-      accessorKey: "student_company_name",
+      header: "Heading",
+      accessorKey: "notification_heading",
     },
     {
-      header: "Alt Text",
-      accessorKey: "student_company_image_alt",
+      header: "Date",
+      accessorKey: "notification_date",
       enableSorting: false,
     },
     {
       header: "Status",
-      accessorKey: "student_company_status",
+      accessorKey: "notification_status",
       cell: ({ row }) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${
-            row.original.student_company_status === "Active"
+            row.original.notification_status === "Active"
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800"
           }`}
         >
-          {row.original.student_company_status}
+          {row.original.notification_status}
         </span>
       ),
     },
@@ -98,23 +103,23 @@ const CompanyList = () => {
   return (
     <>
       <DataTable
-        data={data?.data || []}
+        data={data?.data.data}
         columns={columns}
         pageSize={50}
-        searchPlaceholder="Search companies..."
+        searchPlaceholder="Search Notifications..."
         addButton={{
           onClick: handleCreate,
-          label: "Add Company",
+          label: "Add Notification",
         }}
       />
 
-      <CompanyDialog
+      <NotificationDialog
         open={open}
         onClose={() => setOpen(false)}
-        companyId={editId}
+        Id={editId}
       />
     </>
   );
 };
 
-export default CompanyList;
+export default NotificationList;

@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { COMPANY_API } from "@/constants/apiConstants";
+import { NOTIFICATION_API } from "@/constants/apiConstants";
 import { useApiMutation } from "@/hooks/useApiMutation";
 import { getImageBaseUrl } from "@/utils/imageUtils";
 import { useQueryClient } from "@tanstack/react-query";
@@ -18,13 +18,13 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 const initialState = {
-  student_company_name: "",
-  student_company_image_alt: "",
-  student_company_status: "Active",
-  student_company_image: null,
+  notification_heading: "",
+  notification_date: "",
+  notification_status: "Active",
+  notification_image: null,
 };
-const CompanyDialog = ({ open, onClose, companyId }) => {
-  const isEdit = Boolean(companyId);
+const NotificationDialog = ({ open, onClose, Id }) => {
+  const isEdit = Boolean(Id);
   const queryClient = useQueryClient();
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState(initialState);
@@ -32,7 +32,7 @@ const CompanyDialog = ({ open, onClose, companyId }) => {
   const { trigger, loading } = useApiMutation();
 
   const [preview, setPreview] = useState({
-    student_company_image: "",
+    notification_image: "",
   });
 
   useEffect(() => {
@@ -45,29 +45,29 @@ const CompanyDialog = ({ open, onClose, companyId }) => {
     const fetchData = async () => {
       try {
         const res = await fetchCompany({
-          url: COMPANY_API.byId(companyId),
+          url: NOTIFICATION_API.byId(Id),
         });
         const data = res.data;
         setFormData({
-          student_company_name: data.student_company_name,
-          student_company_image_alt: data.student_company_image_alt,
-          student_company_status: data.student_company_status,
-          student_company_image: null,
+          notification_heading: data.notification_heading,
+          notification_date: data.notification_date,
+          notification_status: data.notification_status,
+          notification_image: null,
         });
-        const IMAGE_FOR = "Student Company";
+        const IMAGE_FOR = "Notification";
         const baseUrl = getImageBaseUrl(res?.image_url, IMAGE_FOR);
 
         setPreview({
-          student_company_image: `${baseUrl}${data.student_company_image}`,
+          notification_image: `${baseUrl}${data.notification_image}`,
         });
       } catch (err) {
-        toast.error(err.message || "Failed to load country data");
+        toast.error(err.message || "Failed to load Notification data");
       }
     };
     fetchData();
-  }, [open, companyId]);
+  }, [open, Id]);
 
-  const handleChange = (e) => {
+  const handleChange = (e) => { 
     const { name, value } = e.target;
     setFormData((p) => ({ ...p, [name]: value }));
     setErrors((p) => ({ ...p, [name]: "" }));
@@ -75,10 +75,9 @@ const CompanyDialog = ({ open, onClose, companyId }) => {
 
   const validate = () => {
     const err = {};
-    if (!formData.student_company_name) err.student_company_name = "Required";
-    if (!formData.student_company_image_alt)
-      err.student_company_image_alt = "Required";
-    if (!preview.student_company_image) err.student_company_image = "Required";
+    if (!formData.notification_heading) err.notification_heading = "Required";
+    if (!formData.notification_date) err.notification_date = "Required";
+    if (!preview.notification_image) err.notification_image = "Required";
 
     setErrors(err);
     return Object.keys(err).length === 0;
@@ -89,26 +88,17 @@ const CompanyDialog = ({ open, onClose, companyId }) => {
 
     const formDataObj = new FormData();
 
-    formDataObj.append("student_company_name", formData.student_company_name);
-    formDataObj.append(
-      "student_company_image_alt",
-      formData.student_company_image_alt
-    );
-    formDataObj.append(
-      "student_company_status",
-      formData.student_company_status
-    );
+    formDataObj.append("notification_heading", formData.notification_heading);
+    formDataObj.append("notification_date", formData.notification_date);
+    formDataObj.append("notification_status", formData.notification_status);
 
-    if (formData.student_company_image instanceof File) {
-      formDataObj.append(
-        "student_company_image",
-        formData.student_company_image
-      );
+    if (formData.notification_image instanceof File) {
+      formDataObj.append("notification_image", formData.notification_image);
     }
     try {
       const res = await trigger({
-        url: isEdit ? COMPANY_API.updateById(companyId) : COMPANY_API.create,
-        method: "post",
+        url: isEdit ? NOTIFICATION_API.updateById(Id) : NOTIFICATION_API.create,
+        method: isEdit ? "put" : "post",
         data: formDataObj,
         headers: {
           "Content-Type": "multipart/form-data",
@@ -117,8 +107,8 @@ const CompanyDialog = ({ open, onClose, companyId }) => {
 
       if (res?.code === 200 || res?.code === 201) {
         toast.success(res.msg);
-        queryClient.invalidateQueries(["company-list"]);
-        queryClient.invalidateQueries(["companies-dropdown"]);
+        queryClient.invalidateQueries(["notification-list"]);
+        queryClient.invalidateQueries(["notification-dropdown"]);
         onClose();
       } else {
         toast.error(res?.msg || "Failed");
@@ -146,38 +136,39 @@ const CompanyDialog = ({ open, onClose, companyId }) => {
       <DialogContent className="max-w-2xl" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? "Edit Company" : "Create Company"}
+            {isEdit ? "Edit Notification" : "Create Notification"}
           </DialogTitle>
         </DialogHeader>
 
         <div className="grid grid-cols-1  gap-4">
           <div>
-            <Label>Company Name *</Label>
+            <Label>Notification Heading *</Label>
             <Input
-              name="student_company_name"
-              value={formData.student_company_name}
+              name="notification_heading"
+              value={formData.notification_heading}
               onChange={handleChange}
             />
             <div className="flex justify-between">
-              {errors.student_company_name && (
+              {errors.notification_heading && (
                 <p className="text-sm text-red-500">
-                  {errors.student_company_name}
+                  {errors.notification_heading}
                 </p>
               )}
             </div>
           </div>
 
           <div>
-            <Label>Image Alt *</Label>
-            <Textarea
-              name="student_company_image_alt"
-              value={formData.student_company_image_alt}
+            <Label>Notification Date*</Label>
+            <Input
+              type="date"
+              name="notification_date"
+              value={formData.notification_date}
               onChange={handleChange}
             />
             <div className="flex justify-between">
-              {errors.student_company_image_alt && (
+              {errors.notification_date && (
                 <p className="text-sm text-red-500">
-                  {errors.student_company_image_alt}
+                  {errors.notification_date}
                 </p>
               )}
             </div>
@@ -185,14 +176,14 @@ const CompanyDialog = ({ open, onClose, companyId }) => {
 
           <div>
             <ImageUpload
-              id="student_company_image"
-              label="Company Image"
-              previewImage={preview.student_company_image}
+              id="notification_image"
+              label="Notification Image"
+              previewImage={preview.notification_image}
               onFileChange={(e) =>
-                handleImageChange("student_company_image", e.target.files?.[0])
+                handleImageChange("notification_image", e.target.files?.[0])
               }
-              onRemove={() => handleRemoveImage("student_company_image")}
-              error={errors.student_company_image}
+              onRemove={() => handleRemoveImage("notification_image")}
+              error={errors.notification_image}
               format="WEBP"
               maxSize={5}
               allowedExtensions={["webp"]}
@@ -200,14 +191,14 @@ const CompanyDialog = ({ open, onClose, companyId }) => {
             />
           </div>
           {isEdit && (
-            <div>
+            <div className="flex flex-col">
               <Label>Status</Label>
               <GroupButton
-                value={formData.student_company_status}
+                value={formData.notification_status}
                 onChange={(v) =>
                   setFormData((p) => ({
                     ...p,
-                    student_company_status: v,
+                    notification_image: v,
                   }))
                 }
                 options={[
@@ -233,4 +224,4 @@ const CompanyDialog = ({ open, onClose, companyId }) => {
   );
 };
 
-export default CompanyDialog;
+export default NotificationDialog;

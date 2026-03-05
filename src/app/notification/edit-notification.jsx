@@ -71,7 +71,7 @@ const EditCompany = () => {
         const IMAGE_FOR = "Student Company";
         const companyBaseUrl = getImageBaseUrl(
           companyData?.image_url,
-          IMAGE_FOR
+          IMAGE_FOR,
         );
         const noImageUrl = getNoImageUrl(companyData?.image_url);
         const imageUrl = `${companyBaseUrl}${data.student_company_image}`;
@@ -101,8 +101,6 @@ const EditCompany = () => {
       }));
     }
   };
-
-
 
   const validateForm = () => {
     const newErrors = {};
@@ -139,17 +137,17 @@ const EditCompany = () => {
     formDataObj.append("student_company_name", formData.student_company_name);
     formDataObj.append(
       "student_company_image_alt",
-      formData.student_company_image_alt
+      formData.student_company_image_alt,
     );
     formDataObj.append(
       "student_company_status",
-      formData.student_company_status
+      formData.student_company_status,
     );
 
     if (formData.student_company_image instanceof File) {
       formDataObj.append(
         "student_company_image",
-        formData.student_company_image
+        formData.student_company_image,
       );
     }
     try {
@@ -285,7 +283,7 @@ const EditCompany = () => {
                 onFileChange={(e) =>
                   handleImageChange(
                     "student_company_image",
-                    e.target.files?.[0]
+                    e.target.files?.[0],
                   )
                 }
                 onRemove={() => handleRemoveImage("student_company_image")}

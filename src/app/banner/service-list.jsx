@@ -2,24 +2,24 @@ import ApiErrorPage from "@/components/api-error/api-error";
 import DataTable from "@/components/common/data-table";
 import ImageCell from "@/components/common/ImageCell";
 import LoadingBar from "@/components/loader/loading-bar";
-import { BANNER_API } from "@/constants/apiConstants";
+import { SERVICE_API } from "@/constants/apiConstants";
 import { useGetApiMutation } from "@/hooks/useGetApiMutation";
 import { getImageBaseUrl, getNoImageUrl } from "@/utils/imageUtils";
 import { Edit } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const BannerList = () => {
+const ServiceList = () => {
   const {
     data: data,
     isLoading,
     isError,
     refetch,
   } = useGetApiMutation({
-    url: BANNER_API.list,
-    queryKey: ["banner-list"],
+    url: SERVICE_API.list,
+    queryKey: ["service-list"],
   });
 
-  const IMAGE_FOR = "Banner";
+  const IMAGE_FOR = "Service";
   const bannerBaseUrl = getImageBaseUrl(data?.image_url, IMAGE_FOR);
   const noImageUrl = getNoImageUrl(data?.image_url);
 
@@ -42,37 +42,23 @@ const BannerList = () => {
       enableSorting: false,
     },
     {
-      header: "Sort Order",
-      accessorKey: "banner_sort",
+      header: "Service Name",
+      accessorKey: "service_name",
       enableSorting: true,
     },
-    {
-      header: "Banner For",
-      accessorKey: "banner_for",
-      enableSorting: true,
-    },
-    {
-      header: "Banner Text",
-      accessorKey: "banner_text",
-      enableSorting: false,
-    },
-    {
-      header: "Alt Text",
-      accessorKey: "banner_image_alt",
-      enableSorting: false,
-    },
+
     {
       header: "Status",
-      accessorKey: "banner_status",
+      accessorKey: "service_status",
       cell: ({ row }) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${
-            row.original.banner_status === "Active"
+            row.original.service_status === "Active"
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800"
           }`}
         >
-          {row.original.banner_status}
+          {row.original.service_status}
         </span>
       ),
       enableSorting: true,
@@ -94,12 +80,13 @@ const BannerList = () => {
       enableSorting: false,
     },
   ];
+  console.log(data, "data");
   if (isLoading) return <LoadingBar />;
   if (isError) return <ApiErrorPage onRetry={refetch} />;
   return (
     <>
       <DataTable
-        data={data?.data || []}
+        data={data?.data?.data || []}
         columns={columns}
         pageSize={20}
         searchPlaceholder="Search banners..."
@@ -112,4 +99,4 @@ const BannerList = () => {
   );
 };
 
-export default BannerList;
+export default ServiceList;
