@@ -1,18 +1,15 @@
 import Login from "@/app/auth/login";
-import BannerList from "@/app/banner/banner-list";
+import BannerList from "@/app/banner/service-list";
 import CreateBanner from "@/app/banner/create-banner";
 import EditBanner from "@/app/banner/edit-banner";
 import BlogList from "@/app/blog/blog-list";
 import CreateBlog from "@/app/blog/create-blog";
-import CompanyList from "@/app/company/company-list";
-import CountryList from "@/app/country/country";
 import NotFound from "@/app/errors/not-found";
 import FaqForm from "@/app/faq/create-faq";
 import FaqList from "@/app/faq/faq-list";
 import GalleryList from "@/app/gallery/gallery-list";
 import LectureYoutubeForm from "@/app/lecture-youtube/lecture-youtube-form";
 import LetureYoutubeList from "@/app/lecture-youtube/lecture-youtube-list";
-import NewsLetter from "@/app/newsletter/news-letter";
 import PopupList from "@/app/popup/popup";
 import Settings from "@/app/setting/setting";
 import SidePopupList from "@/app/sidepopup/sidepopup-list";
@@ -34,7 +31,11 @@ import EditBlog from "../app/blog/edit-blog";
 import AuthRoute from "./auth-route";
 import ProtectedRoute from "./protected-route";
 import StudenScreenShot from "@/app/student/student-screenshot";
-import LetureYoutubePlayList from "@/app/leture-youtube-playlist/lecture-youtubeplaylist-list";
+import ServiceList from "@/app/banner/service-list";
+import NotificationList from "@/app/notification/notifycation-list";
+import Dashboard from "@/app/home/home";
+import ClientList from "@/app/member/client-list";
+import Createclient from "@/app/member/create-client";
 
 function AppRoutes() {
   return (
@@ -55,29 +56,63 @@ function AppRoutes() {
 
         <Route path="/" element={<ProtectedRoute />}>
           <Route
-            path="/newsletter-list"
+            path="/service-list"
             element={
               <Suspense fallback={<LoadingBar />}>
-                <NewsLetter />
+                <ServiceList />
               </Suspense>
             }
           />
           <Route
-            path="/country-list"
+            path="/notification-list"
             element={
               <Suspense fallback={<LoadingBar />}>
-                <CountryList />
+                <NotificationList />
               </Suspense>
             }
           />
           <Route
-            path="/youtube-playlist"
+            path="/client-list"
             element={
               <Suspense fallback={<LoadingBar />}>
-                <LetureYoutubePlayList />
+                <ClientList />
               </Suspense>
             }
           />
+          <Route
+            path="/client-list/create"
+            element={
+              <Suspense fallback={<LoadingBar />}>
+                <Createclient />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/client-list/create-relation/"
+            element={
+              <Suspense fallback={<LoadingBar />}>
+                <Createclient isRelation={true} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/client-list/edit/:id"
+            element={
+              <Suspense fallback={<LoadingBar />}>
+                <Createclient isEdit={true} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <Suspense fallback={<LoadingBar />}>
+                <Dashboard />
+              </Suspense>
+            }
+          />
+
+          {/* old routes */}
           <Route
             path="/lecture-youtube"
             element={
@@ -240,14 +275,14 @@ function AppRoutes() {
               </Suspense>
             }
           />
-          <Route
+          {/* <Route
             path="/company-list"
             element={
               <Suspense fallback={<LoadingBar />}>
-                <CompanyList />
+                <NotificationList />
               </Suspense>
             }
-          />
+          /> */}
 
           <Route
             path="/faq-list"

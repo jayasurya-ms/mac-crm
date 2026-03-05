@@ -38,8 +38,8 @@ const NAVIGATION_CONFIG = {
     },
 
     MEMBERLIST: {
-      title: "Member",
-      url: "/member-list",
+      title: "Clients",
+      url: "/client-list",
       icon: Image,
       isActive: false,
     },
@@ -55,59 +55,6 @@ const NAVIGATION_CONFIG = {
       icon: Globe,
       isActive: false,
     },
-
-    // STUDENTLIST: {
-    //   title: "Student",
-    //   url: "#",
-    //   icon: Settings,
-    //   items: [
-    //     {
-    //       title: "Testimonial",
-    //       url: "/student-testimonial",
-    //       icon: Users,
-    //     },
-    //     {
-    //       title: "Youtube",
-    //       url: "/student-youtube",
-    //       icon: Users,
-    //     },
-    //     {
-    //       title: "Certificate",
-    //       url: "/student-certificate",
-    //       icon: Users,
-    //     },
-    //     {
-    //       title: "Success Story",
-    //       url: "/student-story",
-    //       icon: Users,
-    //     },
-    //     {
-    //       title: "Recent Passout",
-    //       url: "/student-recent-passout",
-    //       icon: Users,
-    //     },
-    //     {
-    //       title: "Office Image",
-    //       url: "/student-officeimage",
-    //       icon: Users,
-    //     },
-    //     {
-    //       title: "Map",
-    //       url: "/student-map",
-    //       icon: Users,
-    //     },
-    //     {
-    //       title: "Top",
-    //       url: "/student-top",
-    //       icon: Users,
-    //     },
-    //     {
-    //       title: "ScreenShot",
-    //       url: "/student-screenshot",
-    //       icon: Users,
-    //     },
-    //   ],
-    // },
   },
 
   REPORTS: {
@@ -214,7 +161,7 @@ const useNavigationData = (userType) => {
 
 const TEAMS_CONFIG = [
   {
-    name: "AIA",
+    name: "MAC",
     logo: GalleryVerticalEnd,
     plan: "",
   },

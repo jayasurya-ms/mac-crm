@@ -1,6 +1,6 @@
 # <div align="center">
 
-# 🚀 **AIA Website CRM**
+# 🚀 **Mac Website CRM**
 
 ## ✨ Modern Content Management System
 
@@ -107,8 +107,8 @@ Shadcn UI with smooth animations, dark mode support, and beautiful visual hierar
 
 ```bash
 # 1️⃣ Clone the repository
-git clone https://github.com/moorthygithub/aia-website-crm.git
-cd aia-website-crm
+git clone https://github.com/moorthygithub/MAC-website-crm.git
+cd MAC-website-crm
 
 # 2️⃣ Install all dependencies
 npm install
@@ -187,7 +187,7 @@ npm run preview  # 👁️  Preview production build locally
 ## 📂 **Project Structure**
 
 ```
-📁 aia-website-crm/
+📁 MAC-website-crm/
 │
 ├── 📦 src/
 │   ├── 🎨 components/
@@ -405,8 +405,8 @@ Path: app/newsletter/
 ### **Step 1️⃣ : Clone & Install**
 
 ```bash
-git clone https://github.com/moorthygithub/aia-website-crm.git
-cd aia-website-crm && npm install
+git clone https://github.com/moorthygithub/MAC-website-crm.git
+cd MAC-website-crm && npm install
 ```
 
 ### **Step 2️⃣ : Run Development Server**
@@ -519,7 +519,7 @@ VITE_ANALYTICS_ID=your_analytics_id
 VITE_SENTRY_DSN=your_sentry_dsn
 
 # 🎯 App Settings
-VITE_APP_NAME=AIA CRM
+VITE_APP_NAME=Mac CRM
 VITE_APP_VERSION=3.0.8
 VITE_DEBUG_MODE=false
 ```
@@ -559,7 +559,7 @@ We ❤️ contributions! Here's how to get started:
 
 ```bash
 # 1. Fork the repository
-git clone https://github.com/YOUR_USERNAME/aia-website-crm.git
+git clone https://github.com/YOUR_USERNAME/MAC-website-crm.git
 
 # 2. Create feature branch
 git checkout -b feature/amazing-feature
@@ -612,10 +612,10 @@ git push origin feature/amazing-feature
 
 | Platform                 | Link                                                                               |
 | ------------------------ | ---------------------------------------------------------------------------------- |
-| 🐛 **Bug Reports**       | [GitHub Issues](https://github.com/moorthygithub/aia-website-crm/issues)           |
-| 💡 **Feature Requests**  | [GitHub Discussions](https://github.com/moorthygithub/aia-website-crm/discussions) |
-| 📧 **Email Support**     | contact@aiacrm.com                                                                 |
-| 💬 **Discord Community** | [Join Server](https://discord.gg/aiacrm)                                           |
+| 🐛 **Bug Reports**       | [GitHub Issues](https://github.com/moorthygithub/MAC-website-crm/issues)           |
+| 💡 **Feature Requests**  | [GitHub Discussions](https://github.com/moorthygithub/MAC-website-crm/discussions) |
+| 📧 **Email Support**     | contact@MACcrm.com                                                                 |
+| 💬 **Discord Community** | [Join Server](https://discord.gg/MACcrm)                                           |
 
 </div>
 
@@ -667,13 +667,13 @@ If you found this project helpful, please consider:
 - 💬 Providing feedback
 - 🤝 Contributing improvements
 
-### **Made with ❤️ by the AIA Team**
+### **Made with ❤️ by the Mac Team**
 
 ![Made with Love](https://img.shields.io/badge/Made%20with-❤️-ff1744?style=for-the-badge)
 ![Open Source](https://img.shields.io/badge/Open%20Source-💚-green?style=for-the-badge)
 
-**Version 3.0.8** | © 2026 AIA Website CRM | All Rights Reserved
+**Version 3.0.8** | © 2026 Mac Website CRM | All Rights Reserved
 
-[⬆ Back to Top](#-aia-website-crm)
+[⬆ Back to Top](#-MAC-website-crm)
 
 </div>

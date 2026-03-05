@@ -5,6 +5,35 @@ export const PANEL_CHECK = {
   getPanelStatus: "/panel-check-status",
   getEnvStatus: "/panel-fetch-dotenv",
 };
+
+
+
+
+///new
+
+export const SERVICE_API = {
+  list: "/service",
+  byId: (id) => `/side-popup/${id}`,
+  updateById: (id) => `/side-popup/${id}`,
+};
+
+export const NOTIFICATION_API = {
+  list: "/notification",
+  byId: (id) => `/notification/${id}`,
+  updateById: (id) => `/notification/${id}`,
+};
+
+export const CLIENT_API = {
+  list: "/member",
+  byId: (id) => `/member/${id}`,
+  updateById: (id) => `/member/${id}`,
+};
+
+export const ACTIVE_SERVICE_API = {
+  list: "activeServices",
+}
+// old
+
 export const SIDE_POPUP_API = {
   list: "/side-popup",
   byId: (id) => `/side-popup/${id}`,
