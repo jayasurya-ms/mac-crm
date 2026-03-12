@@ -4,7 +4,13 @@ import React, { useEffect, useState } from "react";
 import moment from "moment";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, Search } from "lucide-react";
+import {
+  CalendarIcon,
+  Search,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -21,7 +27,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Download } from "lucide-react";
 import * as XLSX from "xlsx";
 import {
   Select,
@@ -35,10 +40,13 @@ function Request_service() {
   const { trigger, loading, error } = useApiMutation();
   const [reportData, setReportData] = useState([]);
 
-  // Default dates: 1st of the month to today
   const [fromDate, setFromDate] = useState(moment().startOf("month").toDate());
   const [toDate, setToDate] = useState(moment().toDate());
   const [status, setStatus] = useState("all");
+
+  // pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const fetchReport = async () => {
     try {
@@ -51,6 +59,7 @@ function Request_service() {
         },
       });
       setReportData(response?.data || []);
+      setCurrentPage(1);
     } catch (err) {
       console.error("Failed to fetch service request report:", err);
     }
@@ -64,6 +73,14 @@ function Request_service() {
     if (status === "all") return true;
     return item.services_request_status?.toLowerCase() === status;
   });
+
+  // pagination logic
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
 
   const handleExportExcel = () => {
     if (filteredData.length === 0) return;
@@ -102,6 +119,7 @@ function Request_service() {
         <h2 className="text-3xl font-bold tracking-tight">
           Service Request Report
         </h2>
+
         <Button
           onClick={handleExportExcel}
           disabled={loading || filteredData.length === 0}
@@ -115,6 +133,7 @@ function Request_service() {
         <CardHeader>
           <CardTitle>Filter Requests</CardTitle>
         </CardHeader>
+
         <CardContent>
           <div className="flex justify-between items-center gap-10">
             <div className="flex flex-col md:flex-row items-end gap-4">
@@ -122,6 +141,7 @@ function Request_service() {
                 <label className="text-sm font-medium leading-none">
                   From Date
                 </label>
+
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -132,13 +152,10 @@ function Request_service() {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {fromDate ? (
-                        moment(fromDate).format("ll")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
+                      {moment(fromDate).format("ll")}
                     </Button>
                   </PopoverTrigger>
+
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
@@ -155,6 +172,7 @@ function Request_service() {
                 <label className="text-sm font-medium leading-none">
                   To Date
                 </label>
+
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -165,13 +183,10 @@ function Request_service() {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {toDate ? (
-                        moment(toDate).format("ll")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
+                      {moment(toDate).format("ll")}
                     </Button>
                   </PopoverTrigger>
+
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
@@ -194,16 +209,24 @@ function Request_service() {
                 )}
               </Button>
             </div>
+
             <div className="w-full flex">
-              {/* filter to get data by status */}
               <div className="flex flex-col gap-2 w-1/3">
                 <label className="text-sm font-medium leading-none">
                   Status
                 </label>
-                <Select value={status} onValueChange={setStatus}>
+
+                <Select
+                  value={status}
+                  onValueChange={(value) => {
+                    setStatus(value);
+                    setCurrentPage(1);
+                  }}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select Status" />
                   </SelectTrigger>
+
                   <SelectContent>
                     <SelectItem value="all">All</SelectItem>
                     <SelectItem value="pending">Pending</SelectItem>
@@ -221,6 +244,7 @@ function Request_service() {
         <CardHeader>
           <CardTitle>Report Data</CardTitle>
         </CardHeader>
+
         <CardContent>
           {loading ? (
             <div className="space-y-2">
@@ -233,58 +257,85 @@ function Request_service() {
               Failed to load service request data.
             </div>
           ) : (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Request Date</TableHead>
-                    <TableHead>User M_ID</TableHead>
-                    <TableHead>User Name</TableHead>
-                    <TableHead>Service ID</TableHead>
-                    <TableHead>Service Name</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredData.length > 0 ? (
-                    filteredData.map((request) => (
-                      <TableRow key={request.id}>
-                        <TableCell>
-                          {request.services_request_date
-                            ? moment(request.services_request_date).format(
-                                "DD-MM-YYYY",
-                              )
-                            : "-"}
-                        </TableCell>
-                        <TableCell>{request.user_m_id || "-"}</TableCell>
-                        <TableCell>{request.name || "-"}</TableCell>
-                        <TableCell>{request.service_id || "-"}</TableCell>
-                        <TableCell>{request.service_name || "-"}</TableCell>
-                        <TableCell>
-                          <span
-                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
+            <>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Request Date</TableHead>
+                      <TableHead>User M_ID</TableHead>
+                      <TableHead>User Name</TableHead>
+                      <TableHead>Service Name</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+
+                  <TableBody>
+                    {paginatedData.length > 0 ? (
+                      paginatedData.map((request) => (
+                        <TableRow key={request.id}>
+                          <TableCell>
+                            {request.services_request_date
+                              ? moment(request.services_request_date).format(
+                                  "DD-MM-YYYY",
+                                )
+                              : "-"}
+                          </TableCell>
+
+                          <TableCell>{request.user_m_id || "-"}</TableCell>
+                          <TableCell>{request.name || "-"}</TableCell>
+                          <TableCell>{request.service_name || "-"}</TableCell>
+
+                          <TableCell
+                            className={`${
                               request.services_request_status === "Pending"
-                                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                                ? "text-yellow-500"
                                 : request.services_request_status === "Approved"
-                                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                                  : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                  ? "text-green-500"
+                                  : "text-red-500"
                             }`}
                           >
                             {request.services_request_status || "-"}
-                          </span>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={7} className="h-24 text-center">
+                          No service requests found for this date range.
                         </TableCell>
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={7} className="h-24 text-center">
-                        No service requests found for this date range.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Pagination */}
+
+              <div className="flex justify-end items-center gap-2 mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((prev) => prev - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+
+                <span className="text-sm">
+                  Page {currentPage} of {totalPages}
+                </span>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((prev) => prev + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

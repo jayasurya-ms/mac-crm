@@ -32,6 +32,7 @@ const ServiceSubForm = ({
   handleSubImageChange,
   handleRemoveSubImage,
   handleDeleteSubApi,
+  errors,
 }) => {
   return (
     <div className="mt-4 border-t pt-4">
@@ -71,39 +72,49 @@ const ServiceSubForm = ({
                         )}
 
                         {sub.id && handleDeleteSubApi ? (
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Trash2 className="cursor-pointer text-red-500 h-5 w-5 hover:text-red-700 transition-colors" />
-                            </AlertDialogTrigger>
+                          subs.length <= 1 ? (
+                            <Trash2 className="h-5 w-5 text-gray-300 cursor-not-allowed" />
+                          ) : (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Trash2 className="h-5 w-5 text-red-500 cursor-pointer hover:text-red-700 transition-colors" />
+                              </AlertDialogTrigger>
 
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Delete Sub Service?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will
-                                  permanently delete the sub service.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Delete Sub Service?
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will
+                                    permanently delete the sub service.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
 
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  className="bg-red-600 hover:bg-red-700"
-                                  onClick={() =>
-                                    handleDeleteSubApi(index, sub.id)
-                                  }
-                                >
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    className="bg-red-600 hover:bg-red-700"
+                                    onClick={() =>
+                                      handleDeleteSubApi(index, sub.id)
+                                    }
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )
                         ) : (
                           <MinusCircle
-                            className="cursor-pointer text-red-500 h-5 w-5 hover:text-red-700 transition-colors"
-                            onClick={() => handleRemoveSub(index)}
+                            className={`h-5 w-5 transition-colors ${
+                              subs.length <= 1
+                                ? "text-gray-300 cursor-not-allowed"
+                                : "text-red-500 cursor-pointer hover:text-red-700"
+                            }`}
+                            onClick={() =>
+                              subs.length > 1 && handleRemoveSub(index)
+                            }
                           />
                         )}
                       </div>
@@ -111,7 +122,9 @@ const ServiceSubForm = ({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-2">
                       <div className="space-y-2">
-                        <Label>Link</Label>
+                        <Label>
+                          Link
+                        </Label>
                         <Input
                           placeholder="Enter Link (e.g., https://...)"
                           value={sub.service_sub_link}
@@ -181,7 +194,13 @@ const ServiceSubForm = ({
                           format="WEBP"
                           maxSize={5}
                           allowedExtensions={["webp", "png", "jpg", "jpeg"]}
+                          required
                         />
+                        {errors?.subs?.[index]?.service_sub_banner && (
+                          <p className="text-red-500 text-sm">
+                            {errors.subs[index].service_sub_banner}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>

@@ -112,6 +112,68 @@ const Dashboard = () => {
               </Card>
             </div>
 
+            <div className="grid gap-4 mt-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Client Services</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[320px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={usersServiceData}
+                        margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                      >
+                        <CartesianGrid strokeDasharray="5 3" vertical={false} />
+                        <XAxis
+                          dataKey="service_name"
+                          stroke="#888888"
+                          fontSize={14}
+                          tickLine={false}
+                          axisLine={false}
+                        />
+                        <YAxis
+                          stroke="#888888"
+                          fontSize={14}
+                          tickLine={false}
+                          axisLine={false}
+                          tickFormatter={(value) => `${value}`}
+                        />
+                        <Tooltip
+                          cursor={{ fill: "var(--muted)", opacity: 0.2 }}
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              return (
+                                <div className="rounded-lg border bg-background p-2 shadow-sm">
+                                  <div className="flex flex-col">
+                                    <span className="text-[0.70rem] text-muted-foreground">
+                                      Service -{" "}
+                                      {payload[0].payload.service_name}
+                                    </span>
+                                    <span className="font-semibold text-sm">
+                                      Clients - {payload[0].value}
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Bar
+                          dataKey="users_count"
+                          fill="currentColor"
+                          radius={[4, 4, 0, 0]}
+                          className="fill-primary"
+                          barSize={50}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
             <Card>
               <CardHeader>
                 <CardTitle>Latest Service Requests</CardTitle>
@@ -172,68 +234,6 @@ const Dashboard = () => {
                 </div>
               </CardContent>
             </Card>
-
-            <div className="grid gap-4 mt-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Client Services</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[350px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={usersServiceData}
-                        margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis
-                          dataKey="service_name"
-                          stroke="#888888"
-                          fontSize={12}
-                          tickLine={false}
-                          axisLine={false}
-                        />
-                        <YAxis
-                          stroke="#888888"
-                          fontSize={12}
-                          tickLine={false}
-                          axisLine={false}
-                          tickFormatter={(value) => `${value}`}
-                        />
-                        <Tooltip
-                          cursor={{ fill: "var(--muted)", opacity: 0.2 }}
-                          content={({ active, payload }) => {
-                            if (active && payload && payload.length) {
-                              return (
-                                <div className="rounded-lg border bg-background p-2 shadow-sm">
-                                  <div className="flex flex-col">
-                                    <span className="text-[0.70rem] text-muted-foreground">
-                                      Service -{" "}
-                                      {payload[0].payload.service_name}
-                                    </span>
-                                    <span className="font-semibold text-sm">
-                                      Clients - {payload[0].value}
-                                    </span>
-                                  </div>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }}
-                        />
-                        <Bar
-                          dataKey="users_count"
-                          fill="currentColor"
-                          radius={[4, 4, 0, 0]}
-                          className="fill-primary"
-                          barSize={40}
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
           </>
         )}
       </div>

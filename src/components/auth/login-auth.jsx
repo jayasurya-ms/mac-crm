@@ -4,38 +4,35 @@ import { setCredentials } from "@/store/auth/authSlice";
 import { setCompanyDetails } from "@/store/auth/companySlice";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import LoginForm from "./login-form";
 import { toast } from "sonner";
 import Carousel from "./carousel";
 
 const slides = [
   {
-    image:
-      "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-    title: "Master Your Craft",
+    image: "src/assets/hero1.png",
+    title: "Our Smart Solutions",
     description:
-      "Unlock industry-leading courses built by experts who have spent decades in the field. Learn at your own pace, your own way.",
-    stat: "50,000+",
-    statLabel: "Active Learners",
+      "Our Smart Home Devices open up a world of endless possibilities. Dive into the extraordinary, where control and customization know no bounds.",
+    stat: "500+",
+    statLabel: "Clients",
   },
   {
-    image:
-      "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-    title: "Knowledge That Moves You",
+    image: "src/assets/hero2.jpeg",
+    title: "Home Security Camera System",
     description:
-      "From foundational skills to advanced specializations — every program is designed to close the gap between where you are and where you want to be.",
-    stat: "300+",
-    statLabel: "Premium Courses",
+      "Unlock the power of seamless control and vigilant monitoring with our Home Security System in Bangalore. Gain peace of mind knowing that your home is secure no matter where you are.",
+    stat: "100+",
+    statLabel: "Premium Security",
   },
   {
-    image:
-      "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-    title: "Built for Achievers",
+    image: "src/assets/hero3.png",
+    title: "Our LED Solutions",
     description:
-      "Mac is where ambitious professionals come to grow. Join a community that takes learning seriously and careers personally.",
-    stat: "98%",
-    statLabel: "Completion Rate",
+      "MAKc Automation's Smart LED lights for Home and innovative lighting solutions. Our commitment to providing exceptional lighting goes beyond mere illumination.",
+    stat: "100%",
+    statLabel: "Safety Assure",
   },
 ];
 
@@ -48,6 +45,7 @@ export default function AuthUI() {
   const [loadingMessage, setLoadingMessage] = useState("");
   const { trigger: login, loading: isLoading } = useApiMutation();
   const dispatch = useDispatch();
+  const companyImage = useSelector((state) => state.company?.companyImage);
 
   const loadingMessages = [
     "Setting things up...",
@@ -80,21 +78,31 @@ export default function AuthUI() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     if (!email.trim() || !password.trim()) {
       toast.error("Please enter both username and password.");
       return;
     }
+
     const formData = new FormData();
     formData.append("username", email);
     formData.append("password", password);
+
     try {
       const res = await login({
         url: LOGIN.postLogin,
         method: "post",
         data: formData,
       });
-      if (res?.code === 200) {
+
+      if (res?.code === 200 || res?.code === 201) {
         const { UserInfo, version, year } = res;
+
+        // Update Redux with latest company details available in login payload (if any)
+        if (res.company_detils) {
+          dispatch(setCompanyDetails(res.company_detils));
+        }
+
         if (!UserInfo || !UserInfo.token) {
           toast.error("Login Failed: No token received.");
           return;
@@ -108,7 +116,6 @@ export default function AuthUI() {
             tokenExpireAt: UserInfo.token_expires_at,
           }),
         );
-        dispatch(setCompanyDetails(res.company_details));
       } else {
         toast.error(res.message || "Login Failed: Unexpected response.");
       }
@@ -118,6 +125,27 @@ export default function AuthUI() {
   };
 
   const current = slides[slideIndex];
+
+  // Get base URL for images from Redux
+  const companyImageObj = companyImage?.find(
+    (img) => img.image_for === "Company",
+  );
+  const baseUrl =
+    companyImageObj?.image_url ||
+    "https://agsdemo.in/macapi/public/assets/images/company_images/";
+
+  // Get fallback "No Image" URL from Redux
+  const noImageObj = companyImage?.find((img) => img.image_for === "No Image");
+  const fallbackUrl =
+    noImageObj?.image_url ||
+    "https://agsdemo.in/macapi/public/assets/images/no_image.jpg";
+
+  // Get logo path from the REDUX state
+  const logoPath =
+    useSelector((state) => state.company?.companyDetails?.company_logo) || "";
+
+  // If we have a logoPath, append it to base URL. If not, use the explicit fallback URL.
+  const logoUrl = logoPath ? `${baseUrl}${logoPath}` : fallbackUrl;
 
   return (
     <div
@@ -170,12 +198,12 @@ export default function AuthUI() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="mb-8"
+            className="mb-8 flex justify-center"
           >
             <img
-              src="https://aia.in.net/crm/public/assets/images/logo/new_retina_logos.webp"
-              alt="MAC Logo"
-              className="h-9 object-contain"
+              src={logoUrl}
+              alt="MAKc Logo"
+              className="h-[100px] w-[150px]"
             />
           </motion.div>
           <LoginForm

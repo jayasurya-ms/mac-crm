@@ -667,7 +667,7 @@ If you found this project helpful, please consider:
 - 💬 Providing feedback
 - 🤝 Contributing improvements
 
-### **Made with ❤️ by the Mac Team**
+### **Made with ❤️ by the MAKc Team**
 
 ![Made with Love](https://img.shields.io/badge/Made%20with-❤️-ff1744?style=for-the-badge)
 ![Open Source](https://img.shields.io/badge/Open%20Source-💚-green?style=for-the-badge)

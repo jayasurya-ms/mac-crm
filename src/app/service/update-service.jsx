@@ -9,7 +9,7 @@ import ImageUpload from "@/components/image-upload/image-upload";
 import RedStar from "@/components/RedStar";
 import { SERVICE_API } from "@/constants/apiConstants";
 import { useApiMutation } from "@/hooks/useApiMutation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -45,51 +45,66 @@ const UpdateService = () => {
 
   const [subs, setSubs] = useState([]);
   const [errors, setErrors] = useState({});
+  const [initialState, setInitialState] = useState(null);
+
+  const fetchServiceData = async () => {
+    if (!id) return;
+    try {
+      const res = await fetchService({
+        url: SERVICE_API.byId(id),
+        method: "get",
+      });
+      const data = res?.data;
+      if (data) {
+        setFormData({
+          service_name: data.service_name || "",
+          service_description: data.service_description || "",
+          service_other: data.service_other || "",
+          service_status: data.service_status || "Active",
+          service_logo: null,
+        });
+
+        const IMAGE_FOR = "Service";
+        const baseUrl = getImageBaseUrl(res?.image_url, IMAGE_FOR);
+
+        if (data.service_logo) {
+          setPreview({
+            service_logo: `${baseUrl}${data.service_logo}`,
+          });
+        }
+
+        if (data.subs && Array.isArray(data.subs)) {
+          const mappedSubs = data.subs.map((sub) => ({
+            id: Number(sub.id),
+            service_sub_link: sub.service_sub_link || "",
+            service_sub_status: sub.service_sub_status || "Active",
+            service_sub_banner: null,
+            preview_banner: sub.service_sub_banner
+              ? `${baseUrl}${sub.service_sub_banner}`
+              : "",
+          }));
+          setSubs(mappedSubs);
+          setInitialState({
+            formData: {
+              service_name: data.service_name || "",
+              service_description: data.service_description || "",
+              service_other: data.service_other || "",
+              service_status: data.service_status || "Active",
+            },
+            subs: mappedSubs.map((sub) => ({
+              id: sub.id,
+              service_sub_link: sub.service_sub_link,
+              service_sub_status: sub.service_sub_status,
+            })),
+          });
+        }
+      }
+    } catch (error) {
+      toast.error("Failed to fetch service details");
+    }
+  };
 
   useEffect(() => {
-    if (!id) return;
-    const fetchServiceData = async () => {
-      try {
-        const res = await fetchService({
-          url: SERVICE_API.byId(id),
-          method: "get",
-        });
-        const data = res?.data;
-        if (data) {
-          setFormData({
-            service_name: data.service_name || "",
-            service_description: data.service_description || "",
-            service_other: data.service_other || "",
-            service_status: data.service_status || "Active",
-            service_logo: null,
-          });
-
-          const IMAGE_FOR = "Service";
-          const baseUrl = getImageBaseUrl(res?.image_url, IMAGE_FOR);
-
-          if (data.service_logo) {
-            setPreview({
-              service_logo: `${baseUrl}${data.service_logo}`,
-            });
-          }
-
-          if (data.subs && Array.isArray(data.subs)) {
-            const mappedSubs = data.subs.map((sub) => ({
-              id: sub.id, // actual sub_service id
-              service_sub_link: sub.service_sub_link || "",
-              service_sub_status: sub.service_sub_status || "Active",
-              service_sub_banner: null,
-              preview_banner: sub.service_sub_banner
-                ? `${baseUrl}${sub.service_sub_banner}`
-                : "",
-            }));
-            setSubs(mappedSubs);
-          }
-        }
-      } catch (error) {
-        toast.error("Failed to fetch service details");
-      }
-    };
     fetchServiceData();
   }, [id]);
 
@@ -126,7 +141,33 @@ const UpdateService = () => {
   };
 
   const handleRemoveSub = (index) => {
+    if (subs.length <= 1) {
+      toast.error("At least one sub-service is required");
+      return;
+    }
     setSubs((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDeleteSubApi = async (index, subId) => {
+    if (subs.length <= 1) {
+      toast.error("At least one sub-service is required");
+      return;
+    }
+
+    try {
+      const res = await trigger({
+        url: SERVICE_API.delete(subId),
+        method: "delete",
+      });
+
+      if (res?.code === 200 || res?.code === 201 || res?.status === true) {
+        toast.success(res?.message || "Sub service deleted successfully");
+        fetchServiceData();
+        queryClient.invalidateQueries({ queryKey: ["service-list"] });
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Delete failed");
+    }
   };
 
   const handleSubChange = (index, fieldName, value) => {
@@ -160,17 +201,74 @@ const UpdateService = () => {
     );
   };
 
+  const isDirty = useMemo(() => {
+    if (!initialState) return false;
+
+    // Check main form fields
+    if (formData.service_name !== initialState.formData.service_name) return true;
+    if (formData.service_description !== initialState.formData.service_description)
+      return true;
+    if (formData.service_other !== initialState.formData.service_other)
+      return true;
+    if (formData.service_status !== initialState.formData.service_status)
+      return true;
+    if (formData.service_logo instanceof File) return true;
+
+    // Check subs length
+    if (subs.length !== initialState.subs.length) return true;
+
+    // Check individual subs
+    for (let i = 0; i < subs.length; i++) {
+      const sub = subs[i];
+      const initialSub = initialState.subs[i];
+
+      if (sub.service_sub_link !== initialSub.service_sub_link) return true;
+      if (sub.service_sub_status !== initialSub.service_sub_status) return true;
+      if (sub.service_sub_banner instanceof File) return true;
+    }
+
+    return false;
+  }, [formData, subs, initialState]);
+
   const validateForm = () => {
     let newErrors = {};
-    if (!formData.service_name)
+    let isValid = true;
+
+    // Service Name
+    if (!formData.service_name || !formData.service_name.trim()) {
       newErrors.service_name = "Service Name is required";
-    if (!preview.service_logo && !formData.service_logo)
+      isValid = false;
+    }
+
+    // Service Logo (required only if no existing image)
+    if (!formData.service_logo && !preview.service_logo) {
       newErrors.service_logo = "Service Logo is required";
+      isValid = false;
+    }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const newSubErrors = [];
+
+    subs.forEach((sub, index) => {
+      const subError = {};
+
+      // Sub banner validation
+      if (!sub.service_sub_banner && !sub.preview_banner) {
+        subError.service_sub_banner = "Sub banner is required";
+        isValid = false;
+      }
+
+      newSubErrors.push(subError);
+    });
+
+    setErrors({
+      ...newErrors,
+      subs: newSubErrors,
+    });
+    if (!isValid) {
+      toast.error("Please fill all required fields");
+    }
+    return isValid;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -180,7 +278,6 @@ const UpdateService = () => {
     // 1. Standard Fields
     formDataObj.append("service_name", formData.service_name);
     formDataObj.append("service_status", formData.service_status);
-    formDataObj.append("_method", "PATCH"); // MUST HAVE for Laravel Multipart Update
 
     if (formData.service_description)
       formDataObj.append("service_description", formData.service_description);
@@ -194,7 +291,6 @@ const UpdateService = () => {
 
     // 3. Append Subs Array
     subs.forEach((sub, index) => {
-      // If it's an existing sub-service, include the ID
       if (sub.id) {
         formDataObj.append(`subs[${index}][id]`, sub.id);
       }
@@ -218,11 +314,12 @@ const UpdateService = () => {
     try {
       const res = await trigger({
         url: SERVICE_API.updateById(id),
-        method: "POST",
+        method: "post",
         data: formDataObj,
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
-      if (res?.code === 200 || res?.status === true) {
+      if (res?.code === 201 || res?.status === true) {
         queryClient.invalidateQueries({ queryKey: ["service-list"] });
         toast.success(res?.message || "Updated successfully");
         navigate(-1);
@@ -345,6 +442,8 @@ const UpdateService = () => {
               handleSubChange={handleSubChange}
               handleSubImageChange={handleSubImageChange}
               handleRemoveSubImage={handleRemoveSubImage}
+              handleDeleteSubApi={handleDeleteSubApi}
+              errors={errors}
             />
 
             <div className="flex justify-end gap-2 mt-4 pt-4 border-t">
@@ -355,7 +454,7 @@ const UpdateService = () => {
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting || !isDirty}>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

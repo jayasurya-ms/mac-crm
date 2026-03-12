@@ -53,7 +53,7 @@ const AppProvider = ({ children }) => {
 
       if (panelRes?.code === 201) {
         dispatch(setCompanyDetails(panelRes.company_detils));
-        dispatch(setCompanyImage(panelRes.company_image));
+        dispatch(setCompanyImage(panelRes.image_url));
       }
 
       const serverVersion = panelRes?.version?.version_panel;

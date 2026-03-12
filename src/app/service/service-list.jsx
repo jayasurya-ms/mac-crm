@@ -11,10 +11,18 @@ import ToggleStatus from "@/components/toogle/status-toogle";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const ServiceList = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
+  const [status, setStatus] = useState("all");
   const {
     data: servicedata,
     isLoading,
@@ -98,14 +106,20 @@ const ServiceList = () => {
     },
   ];
   const paginationData = servicedata?.data;
+  const rawData = servicedata?.data?.data || servicedata?.data || [];
+
+  const filteredData = rawData.filter((item) => {
+    if (status === "all") return true;
+    return item.service_status?.toLowerCase() === status.toLowerCase();
+  });
 
   if (isLoading) return <LoadingBar />;
   if (isError) return <ApiErrorPage onRetry={refetch} />;
   console.log(paginationData?.total);
   return (
-    <>
+    <div className="px-5">
       <DataTable
-        data={servicedata?.data?.data || servicedata?.data || []}
+        data={filteredData}
         columns={columns}
         backendPagination
         page={paginationData?.current_page}
@@ -113,6 +127,23 @@ const ServiceList = () => {
         onPageChange={(p) => setPage(p)}
         totalRecords={paginationData?.total}
         searchPlaceholder="Search Service..."
+        extraButton={
+          <Select
+            value={status}
+            onValueChange={(value) => {
+              setStatus(value);
+            }}
+          >
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Select Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="Active">Active</SelectItem>
+              <SelectItem value="Inactive">Inactive</SelectItem>
+            </SelectContent>
+          </Select>
+        }
         addButton={{
           onClick: () => {
             navigate("/service-list/create");
@@ -120,7 +151,7 @@ const ServiceList = () => {
           label: "Add Service",
         }}
       />
-    </>
+    </div>
   );
 };
 

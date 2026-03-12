@@ -31,7 +31,6 @@ const CreateService = () => {
     service_name: "",
     service_description: "",
     service_other: "",
-    service_status: "Active",
     service_logo: null,
   });
 
@@ -39,7 +38,14 @@ const CreateService = () => {
     service_logo: "",
   });
 
-  const [subs, setSubs] = useState([]);
+  const [subs, setSubs] = useState([
+    {
+      id: "",
+      service_sub_banner: null,
+      service_sub_link: "",
+      preview_banner: "",
+    },
+  ]);
   const [errors, setErrors] = useState({});
 
   const handleInputChange = (e) => {
@@ -74,6 +80,10 @@ const CreateService = () => {
   };
 
   const handleRemoveSub = (index) => {
+    if (subs.length <= 1) {
+      toast.error("At least one sub-service is required");
+      return;
+    }
     setSubs((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -110,13 +120,42 @@ const CreateService = () => {
 
   const validateForm = () => {
     let newErrors = {};
-    if (!formData.service_name)
-      newErrors.service_name = "Service Name is required";
-    if (!formData.service_logo)
-      newErrors.service_logo = "Service Logo is required";
+    let isValid = true;
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (!formData.service_name || !formData.service_name.trim()) {
+      newErrors.service_name = "Service Name is required";
+      isValid = false;
+    }
+
+    if (!formData.service_logo) {
+      newErrors.service_logo = "Service Logo is required";
+      isValid = false;
+    }
+
+    const newSubErrors = [];
+
+    subs.forEach((sub) => {
+      const subError = {};
+
+      if (!sub.service_sub_banner) {
+        subError.service_sub_banner = "Sub banner is required";
+        isValid = false;
+      }
+
+      newSubErrors.push(subError);
+    });
+
+    setErrors({
+      ...newErrors,
+      subs: newSubErrors,
+    });
+
+    // 🔴 Show toast if validation fails
+    if (!isValid) {
+      toast.error("Please fill all required fields");
+    }
+
+    return isValid;
   };
 
   const handleSubmit = async (e) => {
@@ -125,7 +164,6 @@ const CreateService = () => {
 
     const formDataObj = new FormData();
     formDataObj.append("service_name", formData.service_name);
-    formDataObj.append("service_status", formData.service_status);
     if (formData.service_description)
       formDataObj.append("service_description", formData.service_description);
     if (formData.service_other)
@@ -141,7 +179,6 @@ const CreateService = () => {
         `subs[${index}][service_sub_link]`,
         sub.service_sub_link,
       );
-      formDataObj.append(`subs[${index}][service_sub_status]`, "Active");
       if (sub.service_sub_banner instanceof File) {
         formDataObj.append(
           `subs[${index}][service_sub_banner]`,
@@ -208,36 +245,6 @@ const CreateService = () => {
               </div>
 
               <div className="space-y-2">
-                <Label className="flex">Status</Label>
-                <Select
-                  value={formData.service_status}
-                  onValueChange={(value) =>
-                    handleInputChange({
-                      target: { name: "service_status", value },
-                    })
-                  }
-                >
-                  <SelectTrigger
-                    className={`h-10 w-full ${
-                      formData.service_status === "Active"
-                        ? "bg-green-100 text-green-700 border-green-200"
-                        : "bg-red-100 text-red-700 border-red-200"
-                    }`}
-                  >
-                    <SelectValue placeholder="Select Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Active" className="text-green-700">
-                      Active
-                    </SelectItem>
-                    <SelectItem value="Inactive" className="text-red-700">
-                      Inactive
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
                 <Label className="flex">Service Other</Label>
                 <Textarea
                   name="service_other"
@@ -259,10 +266,10 @@ const CreateService = () => {
                 />
               </div>
 
-              <div className="md:col-span-2 space-y-2">
+              <div className="space-y-2">
                 <ImageUpload
                   id="service_logo"
-                  label="Service Logo *"
+                  label="Service Logo"
                   previewImage={preview.service_logo}
                   onFileChange={(e) =>
                     handleImageChange("service_logo", e.target.files?.[0])
@@ -284,6 +291,7 @@ const CreateService = () => {
               handleSubChange={handleSubChange}
               handleSubImageChange={handleSubImageChange}
               handleRemoveSubImage={handleRemoveSubImage}
+              errors={errors}
             />
 
             <div className="flex justify-end gap-2 mt-4 pt-4 border-t">

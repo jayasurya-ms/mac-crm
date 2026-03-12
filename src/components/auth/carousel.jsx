@@ -62,7 +62,7 @@ export default function Carousel({ current, slideIndex, slides }) {
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 backdrop-blur-sm border border-white/20">
           <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
           <span className="text-white text-sm font-medium tracking-wide">
-            MAC 
+            MAKc 
           </span>
         </div>
       </div>

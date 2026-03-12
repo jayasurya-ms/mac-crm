@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Upload, X } from "lucide-react";
 import { useState } from "react";
+import RedStar from "../RedStar";
 
 const ImageUpload = ({
   id = "image_upload",
@@ -31,7 +32,7 @@ const ImageUpload = ({
     const fileExtension = file.name.split(".").pop().toLowerCase();
     if (!allowedExtensions.includes(fileExtension)) {
       const errorMsg = `Invalid file type. Allowed: ${allowedExtensions.join(
-        ", "
+        ", ",
       )}`;
       setError(errorMsg);
       e.target.value = "";
@@ -41,7 +42,7 @@ const ImageUpload = ({
     const fileSizeInMB = file.size / (1024 * 1024);
     if (fileSizeInMB > maxSize) {
       const errorMsg = `File size exceeds ${maxSize}MB limit. Your file is ${fileSizeInMB.toFixed(
-        2
+        2,
       )}MB`;
       setError(errorMsg);
       e.target.value = "";
@@ -83,10 +84,10 @@ const ImageUpload = ({
 
   return (
     <div className={`${className}`}>
-      <label className="text-sm font-medium" htmlFor={id}>
+      <label className="text-sm font-medium flex" htmlFor={id}>
         {" "}
         {label}
-        {required && <span className="ml-1">*</span>}
+        {required && <RedStar />}
       </label>
 
       {selectedFile || previewImage ? (
