@@ -21,6 +21,7 @@ export const SERVICE_API = {
   byId: (id) => `/service/${id}`,
   updateById: (id) => `/service/${id}?_method=PUT`,
   updateStatus: (id) => `/services/${id}/status`,
+  delete: (id) => `/service-sub/${id}`,
 };
 
 export const NOTIFICATION_API = {
@@ -35,6 +36,7 @@ export const CLIENT_API = {
   byId: (id) => `/member/${id}`,
   updateById: (id) => `/member/${id}`,
   report: "/client-report",
+  updateStatus: (id) => `/members/${id}/status`,
 };
 
 export const REQUEST_API = {

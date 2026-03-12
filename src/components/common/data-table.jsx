@@ -380,7 +380,7 @@ const DataTable = ({
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-
+          {extraButton}
           {/* ADD BUTTON */}
           {addButton &&
             (addButton.to ? (
@@ -396,13 +396,11 @@ const DataTable = ({
                 {addButton.label}
               </Button>
             ))}
-
-          {extraButton}
         </div>
       </div>
 
       {/* TABLE */}
-      <div className="rounded-none border min-h-[31rem] grid grid-cols-1">
+      <div className="rounded-lg shadow-[0_0_2px_0_rgba(0,0,0,0.1)] border min-h-[31rem] grid grid-cols-1 p-2">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((hg) => (

@@ -5,21 +5,22 @@ import { REQUEST_API } from "@/constants/apiConstants";
 import { useGetApiMutation } from "@/hooks/useGetApiMutation";
 import moment from "moment";
 import ToggleAction from "@/components/toogle/action-toggle";
+import { useState } from "react";
 
 const RequestList = () => {
+  const [page, setPage] = useState(1);
+
   const {
     data: memerdata,
     isLoading,
     isError,
     refetch,
   } = useGetApiMutation({
-    url: REQUEST_API.list,
-    queryKey: ["reqest-list"],
+    url: `${REQUEST_API.list}?page=${page}`,
+    queryKey: ["reqest-list", page],
   });
-  console.log(memerdata?.data.data);
 
-  // const [open, setOpen] = useState(false);
-  // const [editId, setEditId] = useState(null);
+  const paginationData = memerdata?.data;
 
   const columns = [
     {
@@ -49,64 +50,34 @@ const RequestList = () => {
       header: "Action",
       accessorKey: "services_request_status",
       cell: ({ row }) => (
-        <span>
-          <ToggleAction
-            initialStatus={row.original.services_request_status}
-            apiUrl={REQUEST_API.updateStatus(row.original.id)}
-            payloadKey="services_request_status"
-            onSuccess={refetch}
-          />
-          {/* <ToggleStatus
-            initialStatus={row.original.notification_status}
-            apiUrl={NOTIFICATION_API.updateStatus(row.original.id)}
-            payloadKey="notification_status"
-            onSuccess={refetch}
-            method="patch"
-          /> */}
-          {/* {row.original.services_request_status} */}
-        </span>
+        <ToggleAction
+          initialStatus={row.original.services_request_status}
+          apiUrl={REQUEST_API.updateStatus(row.original.id)}
+          payloadKey="services_request_status"
+          onSuccess={refetch}
+        />
       ),
     },
-    // {
-    //   header: "Actions",
-    //   accessorKey: "actions",
-    //   cell: ({ row }) => (
-    //     <div className="flex gap-2">
-    //       <abbr title="Change Status">
-    //         <Button
-    //           size="icon"
-    //           variant="outline"
-    //           onClick={() => {
-    //             setEditId(row.original.id);
-    //             setOpen(true);
-    //           }}
-    //         >
-    //           <Edit className="h-4 w-4" />
-    //         </Button>
-    //       </abbr>
-    //     </div>
-    //   ),
-    //   enableSorting: false,
-    // },
   ];
+
   if (isLoading) return <LoadingBar />;
   if (isError) return <ApiErrorPage onRetry={refetch} />;
 
   return (
-    <>
+    <div className="px-5">
       <DataTable
-        data={memerdata?.data.data}
+        data={paginationData?.data || []}
         columns={columns}
         pageSize={50}
         searchPlaceholder="Search Request..."
+        // backend pagination
+        backendPagination={true}
+        page={paginationData?.current_page}
+        totalPages={paginationData?.last_page}
+        totalRecords={paginationData?.total}
+        onPageChange={setPage}
       />
-
-      {/* <RequestDialog
-        open={open}
-        onClose={() => setOpen(false)}
-        Id={editId}
-      /> */}
-    </>
+    </div>
   );
 };
 

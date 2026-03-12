@@ -1,6 +1,7 @@
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
+import makcLogo from "../assets/fevicon.png";
 import {
   Sidebar,
   SidebarContent,
@@ -13,7 +14,6 @@ import {
   Blocks,
   Building2,
   Command,
-  GalleryVerticalEnd,
   Globe,
   Users,
   LayoutDashboard,
@@ -180,8 +180,8 @@ const useNavigationData = (userType) => {
 
 const TEAMS_CONFIG = [
   {
-    name: "MAC",
-    logo: GalleryVerticalEnd,
+    name: "MAKc",
+    logo: makcLogo,
     plan: "",
   },
   {
